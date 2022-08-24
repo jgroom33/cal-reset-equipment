@@ -30,3 +30,11 @@
             commands:
               - configuration copy filename nate to-filename startup-config
               - configuration reset-to-user-config filename startup-config
+  rescue:
+    - name: Return failure
+      set_stats:
+        data: '{{ ansible_failed_result }}'
+        per_host: yes
+    - name: Raising error
+      fail:
+        msg: '{{ ansible_failed_result }}'

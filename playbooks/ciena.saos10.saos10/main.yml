@@ -8,3 +8,12 @@
           ansible.netcommon.netconf_rpc:
             rpc: reset-to-golden-config
             xmlns: 'http://www.ciena.com/ns/yang/ciena-system'
+
+  rescue:
+    - name: Return failure
+      set_stats:
+        data: '{{ ansible_failed_result }}'
+        per_host: yes
+    - name: Raising error
+      fail:
+        msg: '{{ ansible_failed_result }}'
