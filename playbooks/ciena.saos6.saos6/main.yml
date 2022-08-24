@@ -14,7 +14,7 @@
               resource-manager pool set feature traffic-profiling resource classifier count 256
               resource-manager pool set feature transport-oam resource classifier count 512
               resource-manager pool set feature vc-statistics resource classifier count 256
-              system set host-name {{ hostvars[hostname].original_hostname }}
+              system set host-name {{ hostvars[hostname] }}
               interface local set ip {{ hostvars[ipaddress] }}/24
               interface set gateway 10.92.44.1
               ssh server enable
