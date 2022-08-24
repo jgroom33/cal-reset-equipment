@@ -6,4 +6,5 @@
         - name: Reset 10x devices
           connection: netconf
           ansible.netcommon.netconf_rpc:
-            rpc: '<reset-to-golden-config xmlns: "http://www.ciena.com/ns/yang/ciena-system" />'
+            rpc: reset-to-golden-config
+            xmlns: 'http://www.ciena.com/ns/yang/ciena-system'
