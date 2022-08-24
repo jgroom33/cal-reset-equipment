@@ -1,0 +1,32 @@
+---
+- name: execution
+  block:
+    - name: 8x device resets
+      block:
+        - name: Reset saos6 Devices
+          ciena.saos8.saos8_command:
+            commands:
+              - system server scp enable
+        - name: create saos config for 8x devices
+          copy:
+            content: |
+              system set host-name {{ hostvars[hostname] }}
+              interface set interface active ip {{ hostvars[ipaddress] }}/24
+              interface set gateway 10.92.44.1
+              user set max-super-users 10
+              system shell set global-inactivity-timer off
+              system server scp enable
+              chassis dying-gasp enable
+              ssh server enable
+            dest: "/tmp/{{ hostvars[hostname] }}.saos"
+            mode: 0644
+        - name: get 8X Nate file
+          ansible.netcommon.net_put:
+            dest: config/nate
+            src: /tmp/{{ hostvars[hostname] }}.saos
+          connection: network_cli
+        - name: Reset saos8 Devices
+          ciena.saos8.saos8_command:
+            commands:
+              - configuration copy filename nate to-filename startup-config
+              - configuration reset-to-user-config filename startup-config
