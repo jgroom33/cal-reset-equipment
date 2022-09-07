@@ -1,45 +1,36 @@
 ---
-- name: execution
-  block:
-    - name: 6x device resets
-      block:
-        - name: Reset saos6 Devices
-          ciena.saos6.saos6_command:
-            commands:
-              - system server scp enable
-        - name: create saos config for 6x devices
-          copy:
-            content: |
-              resource-manager pool set feature broadcast-containment resource classifier count 256
-              resource-manager pool set feature traffic-profiling resource classifier count 256
-              resource-manager pool set feature transport-oam resource classifier count 512
-              resource-manager pool set feature vc-statistics resource classifier count 256
-              system set host-name {{ hostvars[hostname] }}
-              interface local set ip {{ hostvars[ipaddress] }}/24
-              interface set gateway 10.92.44.1
-              ssh server enable
-              system server scp enable
-              snmp set contact list.nate@ciena.com
-              dhcp client disable
-            dest: "/tmp/{{ hostvars[hostname] }}.saos"
-            mode: 0644
-        - name: set 6X Nate file
-          ansible.netcommon.net_put:
-            dest: config/nate
-            src: /tmp/{{ hostvars[hostname] }}.saos
-          connection: network_cli
-        - name: Reset saos6 Devices
-          ciena.saos6.saos6_command:
-            commands:
-              - configuration copy filename nate to-filename startup-config
-              - chassis post disable
-              - configuration reset-to-user-config filename startup-config
-
-  rescue:
-    - name: Return failure
-      set_stats:
-        data: '{{ ansible_failed_result }}'
-        per_host: yes
-    - name: Raising error
-      fail:
-        msg: '{{ ansible_failed_result }}'
+- hosts:
+    - all
+  gather_facts: false
+  tasks:
+    - name: Reset saos6 Devices
+      ciena.saos6.saos6_command:
+        commands:
+          - system server scp enable
+    - name: create saos config for 6x devices
+      copy:
+        content: |
+          resource-manager pool set feature broadcast-containment resource classifier count 256
+          resource-manager pool set feature traffic-profiling resource classifier count 256
+          resource-manager pool set feature transport-oam resource classifier count 512
+          resource-manager pool set feature vc-statistics resource classifier count 256
+          system set host-name {{ hostvars[hostname] }}
+          interface local set ip {{ hostvars[ipaddress] }}/24
+          interface set gateway 10.92.44.1
+          ssh server enable
+          system server scp enable
+          snmp set contact list.nate@ciena.com
+          dhcp client disable
+        dest: "/tmp/{{ hostvars[hostname] }}.saos"
+        mode: 0644
+    - name: set 6X Nate file
+      ansible.netcommon.net_put:
+        dest: config/nate
+        src: /tmp/{{ hostvars[hostname] }}.saos
+      connection: network_cli
+    - name: Reset saos6 Devices
+      ciena.saos6.saos6_command:
+        commands:
+          - configuration copy filename nate to-filename startup-config
+          - chassis post disable
+          - configuration reset-to-user-config filename startup-config
